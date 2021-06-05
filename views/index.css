@@ -1,0 +1,68 @@
+body {
+  background: #e9ecef;
+}
+
+.container {
+  width: 512px;
+  height: 768px;
+
+  position: relative;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.04);
+
+  margin: 0 auto;
+
+  margin-top: 96px;
+  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+h2 {
+  padding: 60px;
+  padding-top: 150px;
+  padding-bottom: 150px;
+  text-align: center;
+  background: #1abc9c;
+  color: white;
+  font-size: 30px;
+  margin-top: 0;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  margin-bottom: 0;
+}
+
+h3 {
+  padding: 60px;
+  text-align: center;
+  background: #ffad33;
+  margin: 0;
+  color: white;
+  font-size: 20px;
+}
+
+p {
+  padding: 60px;
+  text-align: center;
+  background: #1a75ff;
+  margin: 0;
+  color: white;
+  font-size: 20px;
+}
+
+#myButton {
+  background-color: #ff3333;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 20px;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  height: 100%;
+  border-bottom-right-radius: 1rem;
+  border-bottom-left-radius: 1rem;
+}
