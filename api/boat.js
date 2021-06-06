@@ -3,7 +3,7 @@ const { ds, getEntityId, getEntityKind } = require('../datastore');
 const { BOAT, LOAD } = require('./config');
 const dotenv = require('dotenv');
 
-const { boatResponse, throwError, createLoadSelf, createCarrierSelf, loadResponse, isUnique } = require('./helpers');
+const { boatResponse, throwError, createLoadSelf, createCarrierSelf, loadResponse, isUnique, verifyUser } = require('./helpers');
 const { verifyAccept, verifyContentType } = require('./middleware/helpers');
 const { isJwtExist, isTokenValid } = require('./middleware/auth');
 
@@ -23,6 +23,18 @@ router.post(
   verifyContentType("application/json"),
   async (req, res, next) => {
     try {
+      // Check uniqueness of a boat by name
+      const query = datastore.createQuery(BOAT);
+      const boatEntities = await datastore.runQuery(query);
+
+      if (req.body.name) {
+        isUnique({
+          entities: boatEntities[0],
+          value: req.body.name,
+          attribute: "name"
+        })
+      }
+
       const { sub } = req.payload;
 
       const key = datastore.key(BOAT);
@@ -68,6 +80,12 @@ router.get(
           message: "No boat with this boat_id exists"
         })
       }
+
+      // Check if the user is matched with the owner of the boat
+      const userId = req.payload.sub;
+      const ownerId = boatEntity[0].owner;
+
+      verifyUser(userId, ownerId);
 
       // Create load self
       if (boatEntity[0].loads) {
@@ -173,6 +191,12 @@ router.patch(
       const key = datastore.key([BOAT, parseInt(req.params.boat_id)]);
       const boat = await datastore.get(key);
 
+      // Check if the user is matched with the owner of the boat
+      const userId = req.payload.sub;
+      const ownerId = boat[0].owner;
+
+      verifyUser(userId, ownerId);
+
       const entity = {
         key,
         data: {
@@ -235,6 +259,12 @@ router.put(
       // We need original data because GCP won't allow us to update data partially, technically.
       const key = datastore.key([BOAT, parseInt(req.params.boat_id)]);
       const boat = await datastore.get(key);
+
+      // Check if the user is matched with the owner of the boat
+      const userId = req.payload.sub;
+      const ownerId = boat[0].owner;
+
+      verifyUser(userId, ownerId);
 
       const entity = {
         key,
@@ -305,6 +335,12 @@ router.put(
         loadEntity = entity;
       }
     });
+
+    // Check if the user is matched with the owner of the boat
+    const userId = req.payload.sub;
+    const ownerId = boatEntity.owner;
+
+    verifyUser(userId, ownerId);
 
     // Check if the load is already assigned to a boat
     if (loadEntity.carrier) {
@@ -422,6 +458,12 @@ router.delete(
         }
       });
 
+      // Check if the user is matched with the owner of the boat
+      const userId = req.payload.sub;
+      const ownerId = boatEntity.owner;
+
+      verifyUser(userId, ownerId);
+
       // Delete the load from the Boat
       const deletedLoads = boatEntity.loads.filter(load => load.id !== req.params.load_id);
       
@@ -484,6 +526,12 @@ router.delete(
           message: "Invalid Boat Id"
         })
       }
+
+      // Check if the user is matched with the owner of the boat
+      const userId = req.payload.sub;
+      const ownerId = boatEntity[0].owner;
+
+      verifyUser(userId, ownerId);
 
       // Find loads and delete its carrier
       if (boatEntity[0].loads) {

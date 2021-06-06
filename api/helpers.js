@@ -55,6 +55,15 @@ exports.createCarrierSelf = carrier => {
   }
 }
 
+exports.verifyUser = (userId, ownerId) => {
+  if (ownerId !== userId) {
+    this.throwError({
+      code: 401,
+      message: "You are not allowed to access this entity"
+    })
+  }
+}
+
 exports.checkNumOfAttribute = ({ req, length, action }) => {
   switch (action) {
     case 'ne':

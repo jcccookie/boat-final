@@ -14,7 +14,6 @@ dotenv.config();
 const url = process.env.APP_URL;
 
 // Create a new load
-// Unprotected
 router.post(
   '/',
   verifyAccept("application/json"),
@@ -49,7 +48,6 @@ router.post(
 )
 
 // Get a load
-// Protected
 router.get(
   '/:load_id',
   isJwtExist(),
@@ -103,7 +101,6 @@ router.get(
 )
 
 // Get all loads
-// Unprotected
 // Returns public loads
 router.get(
   '/', 
