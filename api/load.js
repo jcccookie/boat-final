@@ -4,9 +4,8 @@ const { BOAT, LOAD } = require('./config');
 const dotenv = require('dotenv');
 const moment = require('moment');
 
-const { boatResponse, throwError, createLoadSelf, loadResponse, createCarrierSelf } = require('./helpers');
+const { throwError,  loadResponse, createCarrierSelf } = require('./helpers');
 const { verifyAccept, verifyContentType } = require('./middleware/helpers');
-const { isJwtExist, isTokenValid } = require('./middleware/auth');
 
 const router = new Router();
 const datastore = ds();
@@ -49,9 +48,7 @@ router.post(
 
 // Get a load
 router.get(
-  '/:load_id',
-  isJwtExist(),
-  isTokenValid(),
+  '/:load_id/users/:user_id',
   verifyAccept("application/json"),
   async (req, res, next) => {
     try {
@@ -72,7 +69,7 @@ router.get(
       if (load.carrier) {
         // If carrier exists, check if owner of the carrier is matched with the user
         
-        const { sub } = req.payload; // user's sub
+        const userId = req.params.user_id; // user's unique id (sub)
         const carrierId = load.carrier.id; // boat id
 
         // Get carrier's owner
@@ -80,9 +77,9 @@ router.get(
         const boatEntity = await datastore.get(boatKey);
 
         // User and boat's owner are not matched
-        if (boatEntity[0].owner !== sub) {
+        if (boatEntity[0].owner !== userId) {
           throwError({
-            code: 403,
+            code: 401,
             message: "You are not allowed to access to this load"
           })
         }
@@ -161,8 +158,6 @@ router.get(
 // Edit a part of load
 router.patch(
   '/:load_id',
-  isJwtExist(),
-  isTokenValid(),
   verifyAccept("application/json"),
   verifyContentType("application/json"),
   async (req, res, next) => {
@@ -212,8 +207,6 @@ router.patch(
 // Edit an entire load
 router.put(
   '/:load_id',
-  isJwtExist(),
-  isTokenValid(),
   verifyAccept("application/json"),
   verifyContentType("application/json"),
   async (req, res, next) => {
@@ -263,8 +256,6 @@ router.put(
 // Delete a load
 router.delete(
   '/:load_id', 
-  isJwtExist(),
-  isTokenValid(),
   async (req, res, next) => {
     try {
       const loadKey = datastore.key([LOAD, parseInt(req.params.load_id)]);

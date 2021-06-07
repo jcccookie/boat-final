@@ -191,6 +191,13 @@ router.patch(
       const key = datastore.key([BOAT, parseInt(req.params.boat_id)]);
       const boat = await datastore.get(key);
 
+      if (boat[0] === undefined) {
+        throwError({
+          code: 404,
+          message: "No boat with this boat_id exists"
+        })
+      }
+
       // Check if the user is matched with the owner of the boat
       const userId = req.payload.sub;
       const ownerId = boat[0].owner;
@@ -259,6 +266,13 @@ router.put(
       // We need original data because GCP won't allow us to update data partially, technically.
       const key = datastore.key([BOAT, parseInt(req.params.boat_id)]);
       const boat = await datastore.get(key);
+
+      if (boat[0] === undefined) {
+        throwError({
+          code: 404,
+          message: "No boat with this boat_id exists"
+        })
+      }
 
       // Check if the user is matched with the owner of the boat
       const userId = req.payload.sub;
