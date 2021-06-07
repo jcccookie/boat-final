@@ -568,7 +568,7 @@ router.delete(
                 volume: loadEntity[0].volume,
                 content: loadEntity[0].content,
                 creation_date: loadEntity[0].creation_date,
-                public: loadEntity[0].public
+                public: !loadEntity[0].public
               }
             };
     
